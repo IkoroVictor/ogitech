@@ -8,4 +8,11 @@
 
 class StudentState extends Eloquent{
 
+    protected  $table = "studentstates";
+
+    public function student()
+    {
+        return $this->belongsTo("Student", "student_id", "id");
+    }
+
 } 

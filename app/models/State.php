@@ -8,4 +8,13 @@
 
 class State extends Eloquent{
 
+
+    public static  function getCurrentState()
+    {
+        return State::where("active", "=", "1")->first();
+    }
+
+
+
+
 } 

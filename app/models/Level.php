@@ -8,4 +8,18 @@
 
 class Level extends  Eloquent{
 
+
+
+    public function students($state_id)
+    {
+        return StudentState::where("state_id", "=", $state_id)->where("level_id", "=", $this->id)->with("student")->get();
+    }
+
+
+
+
+
+
+
+
 } 

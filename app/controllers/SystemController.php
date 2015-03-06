@@ -13,4 +13,9 @@ class SystemController extends BaseController{
         $state = State::orderBy("id", "desc")->first();
 
     }
+
+    public function getStates()
+    {
+        return Response::json(State::all());
+    }
 } 

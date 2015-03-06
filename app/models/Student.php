@@ -8,4 +8,12 @@
 
 class Student extends Eloquent{
 
+    protected $with = array('user');
+
+    public  function user()
+    {
+        return $this->hasOne("User", "id", "user_id");
+    }
+
+
 } 
