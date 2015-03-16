@@ -11,8 +11,8 @@ class CourseTableSeeder extends Seeder{
     public function run()
     {
         DB::table('courses')->insert(array(
-            array("code" => "COM111", "units" => "3", "semester" => "1", "title" => "Introduction to Computer Science", "level_id" => "1", "status" => "1"),
-            array("code" => "COM112", "units" => "1", "semester" => "1", "title" => "Introduction to Computer Science II", "level_id" => "1", "status" => "1"),
+            array("code" => "COM111", "units" => "3", "semester" => "1", "title" => "Introduction to Computer Science", "level_id" => "1", "status" => "1", "state_id" => '1'),
+            array("code" => "COM112", "units" => "1", "semester" => "1", "title" => "Introduction to Computer Science II", "level_id" => "1", "status" => "1", "state_id" => '1'),
 
         ));
 

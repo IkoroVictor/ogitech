@@ -44,42 +44,70 @@
 			<table class="table ng-table-responsive table-striped table-bordered ng-cloak"
 			id="sheetable" ng-table="tableParams"
 			>
-				
-					<tr class="row1" ng-repeat="d in ctrl.results ">
-						<td class="center" data-title="'S/N'">{{$index + 1}}</td>
+                <thead>
+                <tr>
+                    <th class="text-center"><strong>S/N</strong></th>
+                    <th class="text-center"><strong>Name</strong></th>
+                    <th class="text-center"><strong>Matric Number</strong></th>
+                    <td class="text-center" ng-repeat="cs in ctrl.courses"><strong>{{cs.code}}<br>({{ cs.units }})</strong></td>
+                    <th class="text-center"><strong>Carry Overs</strong></th>
+                    <th class="text-center"><strong>TCL</th>
+                    <th class="text-center"><strong>GP</strong></th>
+                    <th class="text-center"><strong>GPA</strong></th>
+                    <th class="text-center"><strong>CTCL</th>
+                    <th class="text-center"><strong>CGP</strong></th>
+                    <th class="text-center"><strong>CGPA</strong></th>
+                    <th class="text-center"><strong>Class</strong></th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+                <tr class="row1" ng-repeat="d in ctrl.results ">
+						<td class="center" >{{$index + 1}}</td>
 						
-						<td class="center" data-title="'Name'"
+						<td class="center"
 								sortable="'name'">{{ d.student.user.lastname}} {{ d.student.user.firstname }} {{ d.student.user.othername }}</td>
 		
-						<td class="center" data-title="'Matric Number'"
+						<td class="center"
 								sortable="'matric'">{{ d.student.matric_no}}</td>
 
 
-						<div ng-repeat="cs in ctrl.courses">
-                        <td class="center"   data-title="$index">{{cs.code}}</td>
-                        </div>
+                        <td class="text-center" ng-repeat="z in ctrl.courses">{{toGrade(ctrl.getBasicCourseScore(z.id, d.results))}}</td>
 
 								
+
 								
-						<td class="center" data-title="'Prev.'"
-								sortable="'prev'">{{ d.prev}}</td>
-								
-						<td class="center" data-title="'Carry Overs'"
-								sortable="'carry'">{{ d.carry}}</td>
-						
-						
-						<td class="center" data-title="'GPA'"
+						<td class="center"
+								sortable="'carry'"><strong ng-repeat="c in ctrl.getCarryOvers(d)">{{c.course.code}}({{ c.course.units }}) - <i>{{ toGrade(c.total)}}<i>, </strong> </td>
+
+                    <td class="center"
+                        sortable="'prev'">{{ d.tcl}}</td>
+
+                    <td class="center"
+                        sortable="'prev'">{{ d.gp}}</td>
+
+
+						<td class="center"
 								sortable="'gpa'">{{ d.gpa}}</td>
-						
-						<td class="center" data-title="'CGPA'"
+
+                    <td class="center"
+                        sortable="'prev'">{{ d.ctcl}}</td>
+
+                    <td class="center"
+                        sortable="'prev'">{{ d.cgp}}</td>
+
+                    <td class="center"
 								sortable="'cgpa'">{{ d.cgpa}}</td>
 						
-						<td class="center" data-title="'Class'"
+						<td class="center"
 								sortable="'class'">{{ d.class}}</td>
 								
 						
 						
 					</tr>
+                <tbody>
 				
 					
 			</table>

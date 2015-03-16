@@ -53,11 +53,52 @@ class CourseController extends BaseController{
         }
         return Response::json(array("success" => false));
 
+    }
 
 
-
+    public function addCourse()
+    {
+        $payload = json_decode(Input::get("data"));
+        $c_state = State::getCurrentState();
+        $course = new Course();
+        $course->title = $payload->title;
+        $course->units = $payload->units;
+        $course->code = $payload->code;
+        $course->level_id = $payload->level_id;
+        $course->semester  = $payload->semester;
+        $course->status  = $payload->status;
+        $course->state_id = $c_state->id;
+        if($course->save())
+        {
+            return Response::json(array("success" => true, "course" => $course));
+        }
+        return Response::json(array("success" => false));
 
     }
+
+    public function deleteCourse($id)
+    {
+        $c = Course::find($id);
+        $state = State::getCurrentState();
+        if(intval($c->state_id) == intval($state->id))
+        {
+            Result::where("state_id", "=", $c->state_id)->where("course_id", "=", $c->id)->delete();
+            $c->delete();
+            return Response::json(array("success" => true));
+        }
+        else
+        {
+            $res = Result::where("state_id", "<>", $c->state_id)->where("course_id", "=", $c->id);
+            if($res->count() == 0)
+            {
+                $res->delete();
+                return Response::json(array("success" => true));
+            }
+        }
+        return Response::json(array("success" => false));
+
+    }
+
 
 
 
@@ -69,11 +110,17 @@ class CourseController extends BaseController{
         {
 
            $res = Result::find($p->id)->where("state_id", "=", $c_state->id)->first();
-           if($res != null)
+           if($res->exists())
            {
                $gpa = Gpa::where("student_id", "=", $p->student_id)->where("state_id","=",$c_state->id)->first();
-               $gpa->gp = ($gpa->gp - $res->total) + $p->total;
-               $gpa->cgp = ($gpa->cgp - $res->total) + $p->total;
+
+               $rpoint = $this->getGradePoint($res->total, $res->course_id);
+               $ppoint = $this->getGradePoint($p->total, $res->course_id);
+
+
+
+               $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
+               $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
                $gpa->gpa =  ($gpa->gp / $gpa->tcl);
                $gpa->cgpa = ($gpa->cgp / $gpa->ctcl);
                $gpa->save();
@@ -158,5 +205,40 @@ class CourseController extends BaseController{
         return  Response::json($details);
 
 
+    }
+
+    private function getGradePoint($score, $course_id)
+    {
+
+        $course = Course::find($course_id);
+        if ($score < 20)
+            return 0;
+        if ($score < 25)
+            return $course->units;
+        if ($score < 30)
+            return ($course->units * 1.25);
+        if ($score < 35)
+            return ($course->units * 1.5);
+        if ($score < 40)
+            return ($course->units * 1.75);
+        if ($score < 45)
+            return ($course->units * 2);
+        if ($score < 50)
+            return ($course->units * 2.25);
+        if ($score < 55)
+            return ($course->units * 2.5);
+
+        if ($score < 60)
+            return ($course->units * 2.75);
+        if ($score < 65)
+            return ($course->units * 3);
+        if ($score < 70)
+            return ($course->units * 3.25);
+        if ($score < 75)
+            return ($course->units * 3.5);
+        if ($score <= 100)
+            return ($course->units * 4);
+
+        return 0;
     }
 }

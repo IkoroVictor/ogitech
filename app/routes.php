@@ -53,6 +53,8 @@ Route::post('course/{id}/upload', "CourseController@saveScoresFromCSV");
 
 Route::put('course/{id}', "CourseController@saveCourse");
 
+Route::delete('course/{id}', "CourseController@deleteCourse");
+
 Route::get('courses', "CourseController@getAllCourses");
 
 Route::get('courses/{level_id}/{semester}', "CourseController@getCourses");
@@ -63,6 +65,7 @@ Route::get('courses/{level_id}/{semester}/{state_id}', "CourseController@getActi
 //=============================STATES================================//
 
 Route::get('states', "SystemController@getStates");
+Route::get('close-semester', "SystemController@closeSemester");
 
 
 //==========================STUDENTS===============================//
