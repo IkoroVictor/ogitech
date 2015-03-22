@@ -1,3 +1,4 @@
+
 <div ng-controller="ResultsCtrl as ctrl">
 <div class="Title">RESULTS</div>
 
@@ -5,6 +6,7 @@
 <div class="control-icons">
 <div><span class="controls" tooltip-placement="left" tooltip="Print" >&#xf02f;</span></div>
 <div><span class="controls" tooltip-placement="left" tooltip="Excel" >&#xf1c3;</span></div>
+<div><span class="controls" ng-click="openUpd()" tooltip-placement="left" tooltip="Upload" href="#">&#xf093;</span></div>
 </div>
 
 
@@ -74,7 +76,7 @@
 								sortable="'matric'">{{ d.student.matric_no}}</td>
 
 
-                        <td class="text-center" ng-repeat="z in ctrl.courses">{{toGrade(ctrl.getBasicCourseScore(z.id, d.results))}}</td>
+                        <td class="text-center" ng-repeat="z in ctrl.courses">{{ctrl.getBasicCourseScore(z.id, d.results)}}</td>
 
 								
 
@@ -114,5 +116,55 @@
 		</div>
 	
 </div>
+
+
+<script type="text/ng-template" id="ModalUpd.html">
+        <div class="modal-header">
+            <h3 class="modal-title">&#xf093; Upload Result Sheet</h3>
+        </div>
+        <div class="modal-body">
+            <div class="file-upload">
+                <div class="col-xs-6">
+                    <input type="file" class="form-control" ng-file-select="assignfile($files)"  name="data">
+                </div>
+                <div class="col-xs-6">
+                    <button class="btn btn-primary" ng-click="uploadcsv(0)" >Upload</button>
+                </div>
+            </div>
+
+            <div class="divider-full"></div>
+
+
+
+            <div ng-hide="uploadcsv_details_hidden" class="upload-report">
+
+
+                <div class="Report-title">File Uploaded Successfully</div>
+
+
+                <div class="report-content">
+
+
+
+                    <div class="error-report">
+                        <div ng-repeat="err in uploadcsv_response.errors track by $index">
+                            <div class="report-item"><code>{{err}}</code></div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <div class="col-sm-8 down" ng-hide="uploadcsv_progress_hidden"><progressbar class="progress-striped active down" max="200" value="200" type="primary"></progressbar></div>
+
+
+            <button class="btn btn-warning" ng-click="cancel()">Close</button>
+        </div>
+    </script>
+
 
 </div>

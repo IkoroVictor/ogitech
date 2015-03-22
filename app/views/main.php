@@ -26,7 +26,7 @@
                 <a ui-sref-active="menu-active" ui-sref="statistics">
                     <div class="menu-icon">
                         <i class="fa fa-lg fa-fw fa-bar-chart" aria-hidden="true"></i>
-                    </div> Statistics
+                    </div> Dashboard
                 </a>
 
 					<span class="dropdown" dropdown on-toggle="toggled(open)">

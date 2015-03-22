@@ -20,12 +20,12 @@
 </div>
 
 
-<div class="left-top">
-<span>OND 1</span>
-<span>First Semester</span>
-<span>(2014/2015)</span> 
-</div>
 
+    <div class="left-top">
+        <span>{{ ctrl.state.level_name }}</span>
+        <span>{{ ctrl.state.state_name }}</span>
+
+    </div>
 
 </div>
 </div>
@@ -103,7 +103,7 @@
       <input type="file" class="form-control" ng-file-select="assignfile($files)"  name="data">
     </div>
   	<div class="col-xs-6">
-		<button class="btn btn-primary" ng-click="uploadcsv()" >Upload</button>
+		<button class="btn btn-primary" ng-click="uploadcsv(0)" >Upload</button>
 	</div>
 	</div>
 

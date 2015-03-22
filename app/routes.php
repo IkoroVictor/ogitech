@@ -41,6 +41,8 @@ Route::get('level/{id}/students/{state_id}', "LevelController@getClassList");
 Route::get('level/{id}/results/{state_id}', "LevelController@getClassResult");
 
 
+
+
 //=====================COURSES=========================================//
 
 Route::get('course/{id}/result/{state_id}', "CourseController@getScores");
@@ -66,6 +68,7 @@ Route::get('courses/{level_id}/{semester}/{state_id}', "CourseController@getActi
 
 Route::get('states', "SystemController@getStates");
 Route::get('close-semester', "SystemController@closeSemester");
+Route::post('results/upload', "SystemController@uploadResultCSV");
 
 
 //==========================STUDENTS===============================//

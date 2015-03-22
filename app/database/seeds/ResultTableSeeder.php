@@ -13,6 +13,8 @@ class ResultTableSeeder extends Seeder{
         DB::table('results')->insert(array(
             array("course_id" => "1", "student_id" => "1", "state_id" => "1", "in_use" => "1", "ca" => "20", "exam" => "30", "total" => "43"),
             array("course_id" => "2", "student_id" => "1", "state_id" => "1", "in_use" => "1", "ca" => "13", "exam" => "46", "total" => "43"),
+            array("course_id" => "1", "student_id" => "2", "state_id" => "1", "in_use" => "1", "ca" => "20", "exam" => "30", "total" => "43"),
+            array("course_id" => "2", "student_id" => "2", "state_id" => "1", "in_use" => "1", "ca" => "13", "exam" => "46", "total" => "43"),
 
         ));
 

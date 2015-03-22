@@ -105,20 +105,18 @@ class CourseController extends BaseController{
     public function saveScores($course_id)
     {
         $payload = json_decode(Input::get("data"));
+        print_r(json_last_error_msg());
         $c_state = State::getCurrentState();
         foreach($payload as $p)
         {
 
-           $res = Result::find($p->id)->where("state_id", "=", $c_state->id)->first();
+           $res = Result::where("id", "=", $p->id)->where("state_id", "=", $c_state->id)->first();
            if($res->exists())
            {
                $gpa = Gpa::where("student_id", "=", $p->student_id)->where("state_id","=",$c_state->id)->first();
 
                $rpoint = $this->getGradePoint($res->total, $res->course_id);
                $ppoint = $this->getGradePoint($p->total, $res->course_id);
-
-
-
                $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
                $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
                $gpa->gpa =  ($gpa->gp / $gpa->tcl);
@@ -152,6 +150,7 @@ class CourseController extends BaseController{
        // if(!$op->eof() )
           //  $op->fgetcsv();
         $details = array('errors'=>array() );
+        $state = State::getCurrentState();
 
         while(!$op->eof())
         {
@@ -169,7 +168,7 @@ class CourseController extends BaseController{
 
 
             $student = Student::where('matric_no', '=', trim($scores[2]))->first();
-            if(!$student->exists())
+            if(!is_object($student))  //doesn't exist
             {
                 $details['errors'][] = "[ERROR:] Student " . trim($scores[2]). " doesn't exist";
                 continue;
@@ -179,11 +178,23 @@ class CourseController extends BaseController{
                         ->where('course_id', '=', $id)
                         ->where('state_id', '=', State::getCurrentState()->id)->first();
 
-            if(!$result->exists())
+            if(!is_object($result))  // not registered exist
             {
                 $details['errors'][] = "[ERROR:] Student " . trim($scores[2]). " did not register this course.";
                 continue;
             }
+
+
+
+            $gpa = Gpa::where("student_id", "=", $student->id)->where("state_id","=",$state->id)->first();
+
+            $rpoint = $this->getGradePoint($result->total, $result->course_id);
+            $ppoint = $this->getGradePoint($scores[4], $result->course_id);
+            $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
+            $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
+            $gpa->gpa =  ($gpa->gp / $gpa->tcl);
+            $gpa->cgpa = ($gpa->cgp / $gpa->ctcl);
+            $gpa->save();
 
             $result->total = $scores[4];
             $result->save();
@@ -240,5 +251,70 @@ class CourseController extends BaseController{
             return ($course->units * 4);
 
         return 0;
+    }
+
+    function rebuildScores()
+    {
+
+
+        $levels = Level::all();
+        $state = State::getCurrentState();
+
+        Result::where("state_id", "=", $state->id)->delete(); //delete all results for this session;
+
+        foreach ($levels as $level) {
+
+            $students = StudentState::where("state_id", "=", $state->id)->where("level_id", "=", $level->id)->get();
+            foreach ($students as $std) {
+                $tcl = 0;
+                $student = Student::find($std->student_id);
+                if (!$student->status) //skip suspended students
+                    continue;
+                $prv_state = State::where("session", "=", ($state->session - 1))->where("semester", "=", $state->semester);
+                if ($prv_state->exists()) {
+                    $carryovers = Result::where("student_id", "=", $student->id)->where("state_id", "=", $prv_state->id)->where("total", "<", "40.0")->get();
+                    foreach ($carryovers as $carry) {
+                        $res = new Result();
+                        $c = Course::find($carry->course_id);
+                        $res->course_id = $carry->course_id;
+                        $res->student_id = $carry->student_id;
+                        $res->state_id = $state->id;
+                        $res->ca = 0.0;
+                        $res->exam = 0.0;
+                        $res->total = 0.0;
+                        $res->in_use = 1;
+                        $res->save();
+                        $tcl += $c->units;
+                    }
+                }
+
+                if (!$std->is_extra_year) //Register default courses  for non-extra year students
+                {
+                    $courses = Course::where("semester", "=", $state->semester)->where("status", "=", 1)->where("level_id", "=", $level->id)->get();
+                    foreach ($courses as $c) {
+                        $res = new Result();
+                        $res->course_id = $c->id;
+                        $res->student_id = $student->id;
+                        $res->state_id = $state->id;
+                        $res->ca = 0.0;
+                        $res->exam = 0.0;
+                        $res->total = 0.0;
+                        $res->in_use = 1;
+                        $res->save();
+                        $tcl += $c->units;
+
+                    }
+
+                }
+
+                $new_gpa = Gpa::where("student_id", "=", $student->id)->where("state_id", "=", $state->id)->first();
+                $new_gpa->tcl = $tcl;
+                $new_gpa->ctcl = intval($new_gpa->ctcl) + intval($tcl);
+                $new_gpa->save();
+
+            }
+
+        }
+
     }
 }
