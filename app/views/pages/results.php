@@ -128,7 +128,7 @@
                     <input type="file" class="form-control" ng-file-select="assignfile($files)"  name="data">
                 </div>
                 <div class="col-xs-6">
-                    <button class="btn btn-primary" ng-click="uploadcsv(0)" >Upload</button>
+                    <button class="btn btn-primary" ng-click="uploadcsv(1)" >Upload</button>
                 </div>
             </div>
 

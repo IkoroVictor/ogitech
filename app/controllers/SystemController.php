@@ -115,66 +115,96 @@ class SystemController extends BaseController
         $details = array('errors'=>array() );
         $state = State::getCurrentState();
 
+        $courses = array();
+        $c_indexes = array();
+        $h_switch =  0; //"header processed" flag
+        $offset = 3; //array parse offset
+
         while(!$op->eof())
         {
 
-            $scores = $op->fgetcsv();
+            $row = $op->fgetcsv();
 
 
-            if(((count($scores) % 6) > 0) || (floor((count($scores) / 6)) < 1) )
+            if(count($row) < ($offset + 1))  //invalid result csv file
             {
-                $details['errors'][] = "[ERROR:] Line " . ($op->key() + 1) . " could not be parsed." ;
-                continue;
+                $details['errors'][] = "[ERROR:] Line " . ($op->key() + 1) . " could not be parsed. ---- INVALID CSV" ;
+                break;
             }
 
-            if(!is_numeric($scores[0]) || !is_numeric($scores[4])) continue; //Skip the table headers
-
-
-            $student = Student::where('matric_no', '=', trim($scores[2]))->first();
-            if(!is_object($student))  //doesn't exist
+            if(!$h_switch) //if the table headers haven't been parsed
             {
-                $details['errors'][] = "[ERROR:] Student " . trim($scores[2]). " doesn't exist";
-                continue;
+                $temp_courses = array_slice($row, $offset);
+                foreach($temp_courses as $i => $t)
+                {
+                    $c = Course::where("code", "=", trim($t))->where("status", "=", 1)->first();
+                    if(!is_object($c))
+                    {
+                        $details['errors'][] = "[ERROR:] Course code '". $t."' not found."  ;
+                        continue;
+                    }
+
+                    $courses[$c->id] = $c ;
+                    $c_indexes[$c->id] = $i;
+                }
+                $h_switch = 1; //done parsing headers
+            }
+            else
+            {
+                $student = Student::where("matric_no", "=", trim($row[2]))->first();
+                if(!is_object($student)) //student didn't register the course
+                {
+                    $details['errors'][] = "[ERROR:] Matric No. '". $row[2]."' doesn't exist "  ;
+                    continue;
+                }
+                foreach($courses as $course)
+                {
+
+                    $score = trim($row[$c_indexes[$course->id]]);
+                    $details[]= $score; //REMOVE!!!!
+
+                    if(strlen($score) > 0 && is_numeric($score)) // score exists on the sheet
+                    {
+                        $result = Result::where('student_id', '=', $student->id)
+                            ->where('course_id', '=', $course->id)
+                            ->where('state_id', '=', State::getCurrentState()->id)->first();
+
+                        if(!is_object($result))  // not registered exist
+                        {
+                            $details['errors'][] = "[ERROR:] Student " . trim($row[2]). " did not register this course.";
+                            continue;
+                        }
+
+                        $gpa = Gpa::where("student_id", "=", $student->id)->where("state_id","=",$state->id)->first();
+
+                        $rpoint = CourseController::getGradePoint($result->total, $result->course_id);
+                        $ppoint = CourseController::getGradePoint($score, $result->course_id);
+                        $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
+                        $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
+                        $gpa->gpa =  ($gpa->gp / $gpa->tcl);
+                        $gpa->cgpa = ($gpa->cgp / $gpa->ctcl);
+                        $gpa->save();
+
+                        $result->total = $score;
+                        $result->save();
+                    }
+
+                }
+
+
             }
 
-            $result = Result::where('student_id', '=', $student->id)
-                ->where('course_id', '=', $id)
-                ->where('state_id', '=', State::getCurrentState()->id)->first();
-
-            if(!is_object($result))  // not registered exist
-            {
-                $details['errors'][] = "[ERROR:] Student " . trim($scores[2]). " did not register this course.";
-                continue;
-            }
 
 
 
-            $gpa = Gpa::where("student_id", "=", $student->id)->where("state_id","=",$state->id)->first();
 
-            $rpoint = $this->getGradePoint($result->total, $result->course_id);
-            $ppoint = $this->getGradePoint($scores[4], $result->course_id);
-            $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
-            $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
-            $gpa->gpa =  ($gpa->gp / $gpa->tcl);
-            $gpa->cgpa = ($gpa->cgp / $gpa->ctcl);
-            $gpa->save();
 
-            $result->total = $scores[4];
-            $result->save();
+
+
+
         }
 
-        //Return the updated version of the scores data
-
-        $res = Result::where("state_id", "=", State::getCurrentState()->id)->where("course_id", "=", $id)->select();
-        $results = $res->with("student")->get();
-        foreach($results as $r)
-        {
-            $r->setAppends(array('studentstate'));
-        }
-        $details['scores'] =  $results;
-
-
-
+        //TODO Return the updated version of the result data
 
         return  Response::json($details);
 

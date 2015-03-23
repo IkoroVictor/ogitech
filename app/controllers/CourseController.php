@@ -218,7 +218,7 @@ class CourseController extends BaseController{
 
     }
 
-    private function getGradePoint($score, $course_id)
+    public static  function getGradePoint($score, $course_id)
     {
 
         $course = Course::find($course_id);
