@@ -144,13 +144,17 @@ class SystemController extends BaseController
                         continue;
                     }
 
-                    $courses[$c->id] = $c ;
-                    $c_indexes[$c->id] = $i;
+                    $courses[$c->code] = $c ;
+                    $c_indexes[$c->code] = $i;
                 }
                 $h_switch = 1; //done parsing headers
             }
             else
             {
+                if(strlen(trim($row[2])) < 1) // Skip empty rows.
+                    continue;
+
+
                 $student = Student::where("matric_no", "=", trim($row[2]))->first();
                 if(!is_object($student)) //student didn't register the course
                 {
@@ -160,8 +164,10 @@ class SystemController extends BaseController
                 foreach($courses as $course)
                 {
 
-                    $score = trim($row[$c_indexes[$course->id]]);
-                    $details[]= $score; //REMOVE!!!!
+
+
+                    $score = trim($row[$offset + $c_indexes[$course->code]]);
+                    //$details[]= $score; //REMOVE!!!!
 
                     if(strlen($score) > 0 && is_numeric($score)) // score exists on the sheet
                     {
