@@ -17,7 +17,8 @@ class SystemController extends BaseController
 
         if ($state->semester == 1) //for first semester
         {
-            foreach ($levels as $level) {
+            foreach ($levels as $level)
+            {
 
                 $students = StudentState::where("state_id", "=", $state->id)->where("level_id", "=", $level->id)->get();
                 foreach ($students as $std) {
@@ -26,6 +27,7 @@ class SystemController extends BaseController
                     if (!$student->status) //skip suspended students
                         continue;
                     $prv_state = State::where("session", "=", ($state->session - 1))->where("semester", "=", $new_state->semester);
+
                     if ($prv_state->exists()) {
                         $carryovers = Result::where("student_id", "=", $student->id)->where("state_id", "=", $prv_state->id)->where("total", "<", "40.0")->get();
                         foreach ($carryovers as $carry) {
@@ -95,6 +97,106 @@ class SystemController extends BaseController
         }
         else{
 
+            $has_carry = 0;
+            $has_extra_year = 0;
+            foreach ($levels as $level)
+            {
+
+                $students = StudentState::where("state_id", "=", $state->id)->where("level_id", "=", $level->id)->get();
+                foreach ($students as $std)
+                {
+                    $tcl = 0;
+                    $student = Student::find($std->student_id);
+                    if (!$student->status) //skip suspended students
+                        continue;
+                    $prv_state = State::where("session", "=", ($state->session - 1))->where("semester", "=", $new_state->semester);
+                    if ($prv_state->exists()) {
+                        $carryovers = Result::where("student_id", "=", $student->id)->where("state_id", "=", $prv_state->id)->where("total", "<", "40.0")->get();
+                        foreach ($carryovers as $carry) {
+                            $res = new Result();
+                            $c = Course::find($carry->course_id);
+                            $res->course_id = $carry->course_id;
+                            $res->student_id = $carry->student_id;
+                            $res->state_id = $new_state->id;
+                            $res->ca = 0.0;
+                            $res->exam = 0.0;
+                            $res->total = 0.0;
+                            $res->in_use = $carry->in_use;
+                            $res->save();
+                            $tcl += $c->units;
+                        }
+                        $has_carry = count($carryovers);
+                    }
+
+                    if(($level->id % 2)  == 0)
+                    {
+                        if(!$has_carry)
+                        {
+                            //Save student as graduate
+                            $gpa = Gpa::where("student_id", "=", $student->id)->where("state_id", "=", $state->id)->first();
+                            $grad = new Graduate();
+                            $grad->degree_class = GradeHelper::getDegreeClass($gpa->cgpa);
+                            $grad->degree_type = intval($level->id/ 2); // 1 for OND, 2 for HND
+                            $grad->state_id = $state->id;
+                            $grad->student_id = $student->id;
+                            $grad->save();
+                            continue; //move to next student;
+                        }
+                        else
+                        {
+                            $has_extra_year = 1; //student has extra year
+                        }
+                    }
+
+                    //PLEASE REVISIT THIS LINE AND FIX...
+                    if (!$std->is_extra_year && !$has_extra_year) //Register default courses  for non-extra year students.
+                    {
+                        $courses = Course::where("semester", "=", $new_state->semester)->where("status", "=", 1)
+                            ->where("level_id", "=", ($level->id + 1))->get();
+                        foreach ($courses as $c) {
+                            $res = new Result();
+                            $res->course_id = $c->id;
+                            $res->student_id = $student->id;
+                            $res->state_id = $new_state->id;
+                            $res->ca = 0.0;
+                            $res->exam = 0.0;
+                            $res->total = 0.0;
+                            $res->in_use = 1;
+                            $res->save();
+                            $tcl += $c->units;
+
+                        }
+
+                    }
+
+                    $gpa = Gpa::where("student_id", "=", $student->id)->where("state_id", "=", $state->id)->first();
+                    $new_gpa = new Gpa();
+                    $new_gpa->level_id = $level->id;
+                    $new_gpa->student_id = $student->id;
+                    $new_gpa->state_id = $new_state->id;
+                    $new_gpa->tcl = $tcl;
+                    $new_gpa->prev_tcl = $gpa->tcl;
+                    $new_gpa->prev_ctcl = $gpa->ctcl;
+                    $new_gpa->prev_cgp = $gpa->cgp;
+                    $new_gpa->cgp = $gpa->cgp;
+                    $new_gpa->prev_cgpa = $gpa->cgpa;
+                    $new_gpa->prev_gp = $gpa->gp;
+                    $new_gpa->prev_gpa = $gpa->gpa;
+
+                    $new_gpa->ctcl = intval($gpa->ctcl) + intval($tcl);
+                    $new_gpa->save();
+
+
+                    $stdstate = new StudentState();
+
+                    $stdstate->level_id = ($level->id + 1);
+                    $stdstate->student_id = $student->id;
+                    $stdstate->state_id = $new_state->id;
+                    $stdstate->is_extra_year = $has_extra_year; //NOT SURE ABOUT THIS!!!??!!!
+                    $stdstate->save();
+                }
+
+            }
         }
 
         return Redirect::to("/");
@@ -118,7 +220,7 @@ class SystemController extends BaseController
         $courses = array();
         $c_indexes = array();
         $h_switch =  0; //"header processed" flag
-        $offset = 3; //array parse offset
+        $offset = 3; //course code columns offset
 
         while(!$op->eof())
         {
@@ -177,7 +279,7 @@ class SystemController extends BaseController
 
                         if(!is_object($result))  // not registered exist
                         {
-                            $details['errors'][] = "[ERROR:] Student " . trim($row[2]). " did not register this course.";
+                            $details['errors'][] = "[ERROR:] Student " . trim($row[2]). " did not register ". $course->code . "." ;
                             continue;
                         }
 

@@ -6,6 +6,7 @@
  * Time: 2:23 PM
  */
 
+
 class CourseController extends BaseController{
 
     public function getScores($id, $state_id)
@@ -115,8 +116,8 @@ class CourseController extends BaseController{
            {
                $gpa = Gpa::where("student_id", "=", $p->student_id)->where("state_id","=",$c_state->id)->first();
 
-               $rpoint = $this->getGradePoint($res->total, $res->course_id);
-               $ppoint = $this->getGradePoint($p->total, $res->course_id);
+               $rpoint = GradeHelper::getGradePoint($res->total, $res->course_id);
+               $ppoint = GradeHelper::getGradePoint($p->total, $res->course_id);
                $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
                $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
                $gpa->gpa =  ($gpa->gp / $gpa->tcl);
@@ -188,8 +189,8 @@ class CourseController extends BaseController{
 
             $gpa = Gpa::where("student_id", "=", $student->id)->where("state_id","=",$state->id)->first();
 
-            $rpoint = $this->getGradePoint($result->total, $result->course_id);
-            $ppoint = $this->getGradePoint($scores[4], $result->course_id);
+            $rpoint = GradeHelper::getGradePoint($result->total, $result->course_id);
+            $ppoint = GradeHelper::getGradePoint($scores[4], $result->course_id);
             $gpa->gp = ($gpa->gp - $rpoint) + $ppoint;
             $gpa->cgp = ($gpa->cgp - $rpoint) + $ppoint;
             $gpa->gpa =  ($gpa->gp / $gpa->tcl);

@@ -38,6 +38,28 @@ class CourseTableSeeder extends Seeder{
             array("code" => "EED126", "units" => "2", "semester" => "2", "title" => "Entrepreneurship Development", "level_id" => "1", "status" => "1", "state_id" => '1'),
             array("code" => "GNS201", "units" => "2", "semester" => "2", "title" => "TECHNICAL ENGLISH II", "level_id" => "1", "status" => "1", "state_id" => '1'),
 
+
+            //FIRST SEMESTER ND II
+            array("code" => "COM211", "units" => "3", "semester" => "1", "title" => "COMPUTER PROGRAMMING  USING OO BASIC", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM212", "units" => "3", "semester" => "1", "title" => "INTRO TO SYSTEM PROGRAMMING", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM213", "units" => "3", "semester" => "1", "title" => "COMMERCIAL  PROGRAMMING  USING OO COBOL", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM214", "units" => "2", "semester" => "1", "title" => "FILE ORGANIZATION AND MANAGEMENT", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM215", "units" => "3", "semester" => "1", "title" => "COMPUTER PACKAGES II", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM216", "units" => "2", "semester" => "1", "title" => "COMPUTER TROUBLESHOOTING I", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM217", "units" => "2", "semester" => "1", "title" => "INTRODUCTION TO LINUX OS ", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "GNS211", "units" => "2", "semester" => "1", "title" => "INTRO. TO SOCIOLOGY", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "EED216", "units" => "2", "semester" => "1", "title" => "PRACTICE OF ENTREPRENEURSHIP", "level_id" => "2", "status" => "1", "state_id" => '1'),
+
+            //SECOND SEMESTER ND II
+            array("code" => "COM221", "units" => "3", "semester" => "2", "title" => "COMP. PROG USING OO FORTRAN", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM222", "units" => "2", "semester" => "2", "title" => "SEMINAR ON COMP. AND SOCIETY", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM223", "units" => "3", "semester" => "2", "title" => "BASIC HARDWARE MAINTENANCE", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM224", "units" => "3", "semester" => "2", "title" => "MANAGEMENT INFORMATION SYSTEM", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM225", "units" => "3", "semester" => "2", "title" => "WEB TECHNOLOGY", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM226", "units" => "2", "semester" => "2", "title" => "COMPUTER SYSTEMS TROUBLESHOOTING ", "level_id" => "2", "status" => "1", "state_id" => '1'),
+            array("code" => "COM229", "units" => "4", "semester" => "2", "title" => "PROJECT", "level_id" => "2", "status" => "1", "state_id" => '1')
+
+
         ));
 
     }
