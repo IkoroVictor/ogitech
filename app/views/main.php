@@ -8,6 +8,8 @@
     <link href="assets/font-awesome/css/font-awesome.min.css"
           rel="stylesheet">
 
+
+
 </head>
 <body class="main-body-area" ng-app="mainApp">
 
@@ -103,7 +105,11 @@
 
 
 
+
+<script src="assets/js/highcharts-ng/jquery.min.js"></script>
 <script src="assets/js/angular.min.js"></script>
+<script src="assets/js/highcharts-ng/highstock.src.js"></script>
+<script src="assets/js/highcharts-ng/highcharts-ng.js"></script>
 <script src="assets/js/angular-ui-router.min.js"></script>
 <script src="assets/js/ng-table.min.js"></script>
 <script src="assets/js/ui-bootstrap-tpls-0.12.0.min.js"></script>
@@ -116,6 +122,8 @@
 <script src="assets/js/main.js"></script>
 
 <script src="assets/js/controllers.js"></script>
+
+
 
 </body>
 </html>

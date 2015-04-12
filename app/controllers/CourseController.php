@@ -254,7 +254,7 @@ class CourseController extends BaseController{
         return 0;
     }
 
-    function rebuildScores()
+    function reRegisterCourseAllLevels()
     {
 
 
@@ -309,13 +309,24 @@ class CourseController extends BaseController{
                 }
 
                 $new_gpa = Gpa::where("student_id", "=", $student->id)->where("state_id", "=", $state->id)->first();
+
+
+                if(!$new_gpa->ctcl) //NEW STUDENT
+                {
+                    $new_gpa->ctcl = intval($tcl);
+                }
+                else
+                {
+                    $new_gpa->ctcl = intval($new_gpa->ctcl - $new_gpa->tcl) + intval($tcl);
+                }
                 $new_gpa->tcl = $tcl;
-                $new_gpa->ctcl = intval($new_gpa->ctcl) + intval($tcl);
+
                 $new_gpa->save();
 
             }
 
         }
+        return  Response::json($levels);
 
     }
 }

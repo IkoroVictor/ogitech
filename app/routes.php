@@ -33,6 +33,8 @@ Route::get('/page/class', 'PageController@getDefaultClassPage');
 
 Route::get('/page/results', 'PageController@getResultsPage');
 
+Route::get('/page/dashboard', 'PageController@getDashboardPage');
+
 
 Route::post("/login", "UserController@login");
 
@@ -67,6 +69,7 @@ Route::get('courses/{level_id}/{semester}/{state_id}', "CourseController@getActi
 //=============================STATES================================//
 
 Route::get('states', "SystemController@getStates");
+Route::get('dashboard-data', "SystemController@getDashboardData");
 Route::get('close-semester', "SystemController@closeSemester");
 Route::post('results/upload', "SystemController@uploadResultCSV");
 
@@ -75,3 +78,14 @@ Route::post('results/upload', "SystemController@uploadResultCSV");
 Route::put('student/{id}', "StudentController@saveStudent");
 
 Route::post('student', "StudentController@addStudent");
+
+
+
+
+
+
+
+
+
+
+Route::get('reb', "CourseController@reRegisterCourseAllLevels");

@@ -26,6 +26,10 @@ class PageController extends  BaseController{
     {
         return View::make('pages.sheet');
     }
+    public function getDashboardPage()
+    {
+        return View::make('pages.dashboard');
+    }
 
     public function getCoursesPage()
     {
